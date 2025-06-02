@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pesquisa de Satisfação Nx Boats</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <img src="https://www.allflags.com.br/wp-content/uploads/2017/09/logo_nxboats.png" alt="Logo Nx Boats" class="logo" />
+    <h1>Pesquisa de Satisfação</h1>
+    <form id="pesquisaForm">
+      <fieldset>
+        <legend>1. Condições de limpeza e montagem</legend>
+        <label><input type="radio" name="limpeza" value="1" /> Excelente</label>
+        <label><input type="radio" name="limpeza" value="2" /> Boa</label>
+        <label><input type="radio" name="limpeza" value="3" /> Regular</label>
+        <label><input type="radio" name="limpeza" value="4" /> Ruim</label>
+        <label><input type="radio" name="limpeza" value="5" /> Péssima</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Atendimento da equipe de vendas</legend>
+        <label><input type="radio" name="vendas" value="1" /> Sim, completamente</label>
+        <label><input type="radio" name="vendas" value="2" /> Parcialmente</label>
+        <label><input type="radio" name="vendas" value="3" /> Não atendeu</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Prazo de entrega</legend>
+        <label><input type="radio" name="prazo" value="1" /> Sim</label>
+        <label><input type="radio" name="prazo" value="2" /> Parcialmente</label>
+        <label><input type="radio" name="prazo" value="3" /> Não</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. Qualidade do barco</legend>
+        <label><input type="radio" name="qualidade" value="1" /> Excelente</label>
+        <label><input type="radio" name="qualidade" value="2" /> Boa</label>
+        <label><input type="radio" name="qualidade" value="3" /> Regular</label>
+        <label><input type="radio" name="qualidade" value="4" /> Ruim</label>
+        <label><input type="radio" name="qualidade" value="5" /> Péssima</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>5. Recebimento de informações técnicas e comerciais</legend>
+        <label><input type="radio" name="info" value="1" /> Sim</label>
+        <label><input type="radio" name="info" value="2" /> Parcialmente</label>
+        <label><input type="radio" name="info" value="3" /> Não</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>6. Houve algum problema após a entrega?</legend>
+        <label><input type="radio" name="problema" value="1" /> Não</label>
+        <label><input type="radio" name="problema" value="2" /> Sim — Se sim, qual?</label>
+        <textarea name="descricaoProblema" placeholder="Descreva aqui (opcional)"></textarea>
+      </fieldset>
+
+      <fieldset>
+        <legend>7. De 0 a 10, quanto recomendaria a Nx Boats?</legend>
+        <div class="scale-container">
+          <!-- 0 a 10 escala -->
+          <label><input type="radio" name="nps" value="1" />0</label>
+          <label><input type="radio" name="nps" value="2" />1</label>
+          <label><input type="radio" name="nps" value="3" />2</label>
+          <label><input type="radio" name="nps" value="4" />3</label>
+          <label><input type="radio" name="nps" value="5" />4</label>
+          <label><input type="radio" name="nps" value="6" />5</label>
+          <label><input type="radio" name="nps" value="7" />6</label>
+          <label><input type="radio" name="nps" value="8" />7</label>
+          <label><input type="radio" name="nps" value="9" />8</label>
+          <label><input type="radio" name="nps" value="10" />9</label>
+          <label><input type="radio" name="nps" value="11" />10</label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>8. Comentários ou sugestões</legend>
+        <textarea name="comentarios" id="comentarios"placeholder="Compartilhe suas ideias (opcional)"></textarea>
+      </fieldset>
+
+      <!-- Perguntas da pesquisa aqui (omiti para foco no login) -->
+
+      <button type="submit">Enviar Pesquisa</button>
+    </form>
+  </div>
+
+  <!-- Modal Feedback -->
+  <div class="modal" id="modalSucesso">
+    <div class="modal-content">
+      <i class="bi bi-check-circle-fill"></i>
+      <h2>Obrigado!</h2>
+      <p>Seu feedback foi enviado com sucesso.</p>
+      <p><strong>Session ID:</strong> <span id="sessionIdTexto">Carregando...</span></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('pesquisaForm');
+    const modal = document.getElementById('modalSucesso');
+    const sessionIdTexto = document.getElementById('sessionIdTexto');
+  
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+  
+      const getRadioValue = (name) => {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        return selected ? selected.value : null;
+      };
+  
+      const data = {
+        limpeza: getRadioValue('limpeza'),
+        vendas: getRadioValue('vendas'),
+        prazo: getRadioValue('prazo'),
+        qualidade: getRadioValue('qualidade'),
+        info: getRadioValue('info'),
+        problema: getRadioValue('problema'),
+        descricaoProblema: document.querySelector('textarea[name="descricaoProblema"]').value || null,
+        nps: getRadioValue('nps'),
+        comentarios: document.querySelector('textarea[name="comentarios"]').value || null
+      };
+  
+      try {
+        const response = await fetch('http://chrystyan.ddns.com.br:3000/api/inserir-pesquisa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+  
+        const result = await response.json();
+        sessionIdTexto.innerText = result.sucesso
+          ? 'Pesquisa enviada com sucesso no Sankhya!'
+          : 'Erro ao enviar: ' + (result.erro || 'Desconhecido');
+  
+      } catch (error) {
+        console.error('Erro ao chamar a API:', error);
+        sessionIdTexto.innerText = 'Erro ao enviar pesquisa para o servidor.';
+      }
+  
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        modal.style.display = 'none';
+        form.reset();
+      }, 5000);
+    });
+  </script>
+</body>
+</html>
